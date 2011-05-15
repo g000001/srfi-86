@@ -6,6 +6,7 @@
   :serial t
   :depends-on (:srfi-23 :mbe)
   :components ((:file "package")
+               (:file "utils")
                (:file "srfi-86")
                (:file "test")))
 

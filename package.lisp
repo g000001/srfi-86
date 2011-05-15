@@ -17,5 +17,5 @@
   (:use :srfi-86 :mbe :cl :fiveam)
   (:shadowing-import-from :srfi-23
                           :error)
-  (:shadow :t))
+  (:shadow :t :loop :let))
 
