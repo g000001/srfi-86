@@ -35,7 +35,26 @@
                      ((h i j . k) e 9 10 h i j))
                     (list a b c d e f g h i j k))
              '(1 2 1 4 8 5 (6 7) 8 9 10 (8 9 10))))
-  ;;
+  ;; 4
+  (is (equal (alet* tag ((a 1)
+                         (a b b c (mu (+ a 2) 4 5 6))
+                         ((d e e) b 5 (+ a b c)))
+                    (if (< a 10)
+                        (tag a 10 b c c d e d)
+                        (list a b c d e)))
+             '(10 6 6 5 5)))
+  ;; 5 色々厳しい…
+  ;; letrec と lambda* の組み合わせを問題をmacroexpand-allを使わずに解決したい
+  (is (equal (alet* ((a 1)
+                     ((b 2) (b c c (mu 3 4 5)) ((d e d (mu a b c)) . intag) . tag)
+                     (f 6))
+                    (if (< d 10)
+                        (intag d e 10)
+                        (if (< c 10)
+                            (tag b 11 c 12 a b d #'intag)
+                            (list a b c d e f))))
+             '(1 11 12 10 3 6)))
+  ;; 6
   (is (equal (let ((*standard-output*
                     (make-string-output-stream :element-type 'character)))
                (unwind-protect
@@ -49,6 +68,7 @@
                                    (get-output-stream-string *standard-output*)))
                        (display "end")))))
              '(10 "1st2nd3rd(1 2 3)")))
+  ;; 7a
   (is (equal (let ((*standard-output*
                     (make-string-output-stream :element-type 'character)))
 
@@ -65,6 +85,24 @@
                 (get-output-stream-string *standard-output*)))
 
              '(nil "1st2ndfalse")))
+  ;; 7b
+  (is (equal (let ((*standard-output*
+                    (make-string-output-stream :element-type 'character)))
+
+               (list
+
+                (unwind-protect
+                    (progn
+                      (alet ((and (a (begin (display "1st") 1))
+                                  (b (begin (display "2nd") 2) (< b 2))
+                                  (c (begin (display "false") nil))
+                                  (d (begin (display "3nd") 3))))
+                        (list a b c d))))
+
+                (get-output-stream-string *standard-output*)))
+
+             '(nil "1st2nd")))
+  ;;
   (is (string= ((lambda (str &rest rest)
                   (alet ((cat rest
                               (start 0
@@ -127,4 +165,3 @@
                 (b a))
            (list a b)))
        '(1 10))))
-

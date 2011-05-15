@@ -72,3 +72,23 @@
 
 (defmacro call-with-values (producer consumer)
   `(multiple-value-call ,consumer (funcall ,producer)))
+
+(defmacro let*-mbe ((&rest vars) (&rest vals) &body body)
+  `(let* (,@(mapcar #'list vars vals))
+     ,@body))
+
+
+;; 手抜き
+(defmacro letrec ((&rest vars-and-fctns) &body body)
+  `(labels (,@(mapcar (lambda (x)
+                        (destructuring-bind (name lambda) x
+                          (destructuring-bind (lambda args . body)
+                                              (if (eq 'lambda*
+                                                      (car lambda))
+                                                  (sb-cltl2::macroexpand-all
+                                                   lambda)
+                                                  lambda)
+                            (declare (ignore lambda))
+                            `(,name ,args ,@body))))
+                vars-and-fctns))
+     ,@body))
