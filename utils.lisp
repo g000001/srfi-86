@@ -14,18 +14,19 @@
 (defun-inline eq? (x y) (eq x y))
 
 (defun-inline pair? (obj) (consp obj))
+
 (defun-inline list? (obj) (listp obj))
 
 (defun-inline zero? (x) (zerop x))
+
+(defun-inline equal? (x y)
+  (equal x y))
 
 (defun-inline set-car! (list obj)
   (rplaca list obj))
 
 (defun-inline set-cdr! (cons x)
   (rplacd cons x))
-
-(defun-inline equal? (x y)
-  (equal x y))
 
 (defun-inline memq (x list)
   (cl:member x list :test #'eq))
@@ -79,7 +80,7 @@
 
 
 ;; 手抜き
-(defmacro letrec ((&rest vars-and-fctns) &body body)
+#|(defmacro letrec ((&rest vars-and-fctns) &body body)
   `(labels (,@(mapcar (lambda (x)
                         (destructuring-bind (name lambda) x
                           (destructuring-bind (lambda args . body)
@@ -91,4 +92,19 @@
                             (declare (ignore lambda))
                             `(,name ,args ,@body))))
                 vars-and-fctns))
-     ,@body))
+     ,@body))|#
+
+;; adopted from kawa 1.9 (mit licence)
+(define-syntax letrec
+  (syntax-rules ()
+    ((letrec bindings . body)
+     (%letrec1 () bindings . body))))
+
+(define-syntax %letrec1
+  (syntax-rules (|::|)
+    ((%letrec1 done ((x |::| type init) . bindings) . body)
+     (%letrec1 ((x |::| type '#:undefined) . done) bindings (set! x init) . body))
+    ((%letrec1 done ((x init) . bindings) . body)
+     (%letrec1 ((x '#:undefined) . done) bindings (set! x init) . body))
+    ((%letrec1 done () . body)
+     (srfi-86-internal::let done . body))))

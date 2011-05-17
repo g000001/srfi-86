@@ -40,18 +40,17 @@
                          (a b b c (mu (+ a 2) 4 5 6))
                          ((d e e) b 5 (+ a b c)))
                     (if (< a 10)
-                        (tag a 10 b c c d e d)
+                        (funcall tag a 10 b c c d e d)
                         (list a b c d e)))
              '(10 6 6 5 5)))
-  ;; 5 色々厳しい…
-  ;; letrec と lambda* の組み合わせを問題をmacroexpand-allを使わずに解決したい
+  ;; 5
   (is (equal (alet* ((a 1)
                      ((b 2) (b c c (mu 3 4 5)) ((d e d (mu a b c)) . intag) . tag)
                      (f 6))
                     (if (< d 10)
-                        (intag d e 10)
+                        (funcall intag d e 10)
                         (if (< c 10)
-                            (tag b 11 c 12 a b d #'intag)
+                            (funcall tag b 11 c 12 a b d intag)
                             (list a b c d e f))))
              '(1 11 12 10 3 6)))
   ;; 6
@@ -128,23 +127,23 @@
                            :false . d))
                  (list a b c d))
                '(10 2 30 (40 B 20))))
-    #|(is (equal (alet ((key rest-list
-    (a 1)
-    (b 2)
-    ((c 'cc) 3)
-    :true . d))
-    (list a b c d))
-    '(10 2 30 (40))))|#)
+    (is (equal (alet ((key rest-list
+                           (a 1)
+                           (b 2)
+                           ((c 'cc) 3)
+                           :true . d))
+                     (list a b c d))
+               '(10 20 30 (40)))))
   (let ((rest (list 'a 10 'd 40 "c" 30 50 'b 20)))
-    (is (equal (alet ((key rest1 (a 1) (b 2) ((c "c") 3) . d))
+    (is (equal (alet ((key rest (a 1) (b 2) ((c "c") 3) . d))
                  (list a b c d))
                '(10 2 30 (D 40 50 B 20))))
     (is (equal (alet ((key rest (a 1) (b 2) ((c "c") 3) :false . d))
                  (list a b c d))
                '(10 2 3 (d 40 "c" 30 50 b 20)) ))
-    #|(is (equal (alet ((key rest (a 1) (b 2) ((c "c") 3) :true . d))
-    (list a b c d))
-    '(10 20 30 (d 40 50))))|#)
+    (is (equal (alet ((key rest (a 1) (b 2) ((c "c") 3) :true . d))
+                     (list a b c d))
+               '(10 20 30 (d 40 50)))))
   ;; 11
   (is (equal
        (alet ((a b (mu 1 2))
@@ -164,4 +163,39 @@
                 (() (setq a 10) (setq b 100))
                 (b a))
            (list a b)))
-       '(1 10))))
+       '(1 10)))
+  ;; 13
+  (is (string=
+       (with-output-to-string (*standard-output*)
+         (print
+          (let (m n)
+            (alet ((a (begin (display "1st") 1))
+                   ((b c) 2 (begin (display "2nd") 3))
+                   (() (setq m nil) (setq n (list 8)))
+                   ((d (begin (display "3rd") 4))
+                    (key '(e 5 tmp 6) (e 0) ((f 'tmp) 55)) . p)
+                   g (nu (begin (display "4th") 7) n)
+                   ((values . h) (apply #'values 7 (begin (display "5th") n)))
+                   ((m 11) (n n) . q)
+                   (rec (i (lambda () (- (funcall j) 1)))
+                        (j (lambda ()  10)))
+                   (and (k (begin (display "6th") m))
+                        (l (begin (display "end") (newline) 12)))
+                   (o))
+              (if (< d 10)
+                  (p 40 50 60)
+                  (if (< m 100)
+                      (q 111 n)
+                      (begin (display (list a b c d e f g h (funcall i) (funcall j) k l m n))
+                             (newline))))
+              (o (list o p q))
+              (display "This is not displayed")))))
+
+       "1st2nd3rd4th5th6th
+NIL ")))
+
+
+
+
+
+
