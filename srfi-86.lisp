@@ -252,6 +252,7 @@
         (lambda (t) (declare (line 226))(%alet (p ***) (nv *** (a t)) (bn ***) bd ***))))|#
      (block a
        (macrolet ((a (val) `(return-from a ,val)))
+         (declare (line 255))
          (%alet (p ***) (nv *** #|(a t)|#) (bn ***) bd ***))))
     ((%alet (p ***) (nv ***) ((a . b) bn ***) bd ***)
      (%alet "rot" (p ***) (nv ***) (a) b (bn ***) bd ***))
@@ -327,13 +328,18 @@
     ((alet* "not" (r ***) (a b c ***) (bn ***) bd ***)
      (alet* "not" (r *** a) (b c ***) (bn ***) bd ***))
     ((alet* "not" (r ***) (z) (bn ***) bd ***)
-     (funcallz z (lambda* (r ***) (alet* (bn ***) bd ***))))
+     (funcall z (lambda* (r ***) (alet* (bn ***) bd ***))))
     ((alet* ((a) bn ***) bd ***)
-     (call-with-current-continuation (lambda (a) (declare (line 331))(alet* (bn ***)  bd ***))))
+     #|(call-with-current-continuation
+      (lambda (a) (alet* (bn ***)  bd ***)))|#
+     (block a
+       (macrolet ((a (val) `(return-from a ,val)))
+         (declare (line 336))
+         (alet* (bn ***) bd ***))))
     ((alet* ((a . b) bn ***) bd ***)
      (%alet* () () ((a . b) bn ***) bd ***))
     ((alet* (a b bn ***) bd ***)
-     (funcallb b (lambda (&rest a)(declare (line 335)) (alet* (bn ***) bd ***))))
+     (funcall b (lambda (&rest a)(declare (line 335)) (alet* (bn ***) bd ***))))
     ((alet* var (bn ***) bd ***)
      (%alet* (var) () (bn ***) bd ***))))
 
@@ -520,8 +526,13 @@
     ((%alet* "not" (p ***) (n ***) (r ***) (z) (bn ***) bd ***)
      (funcall z (lambda* (r ***) (%alet* (p ***) (n ***) (bn ***) bd ***))))
     ((%alet* (p ***) (n ***) ((a) bn ***) bd ***)
-     (call-with-current-continuation
-      (lambda (a) (declare (line 505))(%alet* (p ***) (n *** a) (bn ***) bd ***))))
+     #|(call-with-current-continuation
+      (lambda (a) (%alet* (p ***) (n *** a) (bn ***) bd ***)))|#
+     (block a
+       (macrolet ((a (val) `(return-from a ,val)))
+         (declare (line 532))
+         #|(%alet* (p ***) (n *** a) (bn ***) bd ***)|#
+         (%alet* (p ***) (n *** a) (bn ***) bd ***))))
     ((%alet* (p ***) (n ***) ((a . b) bn ***) bd ***)
      (%alet* "rot" (p ***) (n ***) (a) b (bn ***) bd ***))
     ((%alet* "rot" (p ***) (n ***) (new-bn ***) (a . b) (bn ***) bd ***)
@@ -535,7 +546,7 @@
     ((%alet* "rot" (p ***) (n ***) (new-bn ***) b (bn ***) bd ***)
      (%alet* (b (p ***) (n ***) (bn ***)) () (new-bn ***) bd ***))
     ((%alet* (p ***) (n ***) (a b bn ***) bd ***)
-     (funcallb b (lambda (&rest a)(declare (line 519)) (%alet* (p ***) (n *** a) (bn ***) bd ***))))))
+     (funcall b (lambda (&rest a)(declare (line 519)) (%alet* (p ***) (n *** a) (bn ***) bd ***))))))
 
 ;;; auxiliaries
 (define-syntax lambda*

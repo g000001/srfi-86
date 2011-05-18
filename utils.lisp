@@ -37,6 +37,9 @@
 (defun-inline display (obj)
   (princ obj))
 
+(defun-inline newline ()
+  (terpri))
+
 (defmacro set! (var val)
   `(setq ,var ,val))
 
