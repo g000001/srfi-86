@@ -3,6 +3,7 @@
 (cl:in-package :cl-user)
 
 (defpackage :srfi-86
+  (:use)
   (:export :mu
            :nu
            :alet
