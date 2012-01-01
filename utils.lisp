@@ -51,15 +51,16 @@
   (dolist (x binds)
     (unless (= 2(length x))
       (error "malformed NAMED-LET variable spec: ~S" x)))
-  `(labels ((,name ,(mapcar #'first binds) ,@body))
+  `(labels ((,name ,(mapcar #'first binds)
+              (declare (optimize (space 3)))
+              ,@body))
      (,name ,@(mapcar #'second binds))))
 
 (defmacro let (&rest args)
   (etypecase (car args)
-    (list `(cl:let ,@args))
-    (symbol `(#+sbcl sb-int:named-let
-              #-sbcl named-let
-                     ,@args))))
+    (list `(locally (declare (optimize (space 3)))
+             (cl:let ,@args)))
+    (symbol `(named-let ,@args))))
 
 (defmacro receive ((&rest args) vals &body body)
   `(multiple-value-bind (,@args) ,vals
@@ -109,5 +110,9 @@
      (%letrec1 ((x |::| type '#:undefined) . done) bindings (set! x init) . body))
     ((%letrec1 done ((x init) . bindings) . body)
      (%letrec1 ((x '#:undefined) . done) bindings (set! x init) . body))
+    #|((%letrec1 done () . body)
+     (srfi-86-internal::let done . body))|#
     ((%letrec1 done () . body)
-     (srfi-86-internal::let done . body))))
+     (cl:let done . body))))
+
+
