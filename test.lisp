@@ -24,7 +24,6 @@
                                 (b c (mu (progn (princ "2nd") 2) 3))
                                 (d (progn (princ "3rd") 4))
                                 ((e . f) (mu (progn (princ "4th") 5) 6)))
-                           (close *standard-output*)
                            (list (list a b c d e f)
                                  (get-output-stream-string *standard-output*))))))
                  '((1 2 3 4 5 (6)) "1st2nd3rd4th")))
