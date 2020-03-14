@@ -1,2 +1,0 @@
-* SRFI-86 in CL: MU and NU simulating VALUES & CALL-WITH-VALUES, and their related LET-syntax
-

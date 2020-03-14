@@ -1,11 +1,13 @@
-(in-package :srfi-86-internal)
+(in-package "https://github.com/g000001/srfi-86#internals")
 
-(def-suite srfi-86)
-(in-suite srfi-86)
+
+(def-suite* srfi-86)
+
 
 (defun macroexpand-equal (macro form &optional env)
   (equal (funcall (macro-function (car macro)) macro env)
          form))
+
 
 (test alet
       (is (equal (alet (a (mu 1 2))
@@ -164,7 +166,7 @@
                (list a b)))
            '(1 10)))
       ;; 13
-      (is (string=
+      (is (string-equal
            (with-output-to-string (*standard-output*)
              (print
               (let (m n)
@@ -228,3 +230,6 @@ NIL "))
 \(1 2 3 40 50 60 (7 8) (7 8) 9 10 111 12 111 (8))
 
 3 ")))
+
+
+;;; *EOF*

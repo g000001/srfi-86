@@ -2,21 +2,30 @@
 
 (cl:in-package :cl-user)
 
-(defpackage :srfi-86
+
+(defpackage "https://github.com/g000001/srfi-86"
   (:use)
-  (:export :mu
-           :nu
-           :alet
-           :alet*
+  (:export mu
+           nu
+           alet
+           alet*
            ;;
-           :opt
-           :cat
-           :key
-           :rec))
+           opt
+           cat
+           key
+           rec))
 
-(defpackage :srfi-86-internal
-  (:use :srfi-86 :mbe :cl :fiveam)
-  (:shadowing-import-from :srfi-23
-                          :error)
-  (:shadow :t :loop :let))
 
+(defpackage "https://github.com/g000001/srfi-86#internals"
+  (:use
+   "https://github.com/g000001/srfi-86" 
+   mbe
+   cl
+   fiveam)
+  (:shadowing-import-from
+   "https://github.com/g000001/srfi-23"
+   error)
+  (:shadow t loop let))
+
+
+;;; *EOF*

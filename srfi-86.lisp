@@ -3,7 +3,7 @@
 ;;#t -> :true
 ;;#f -> :false
 
-(cl:in-package :srfi-86-internal)
+(in-package "https://github.com/g000001/srfi-86#internals")
 
 (declaim (declaration line))
 
